@@ -24,27 +24,27 @@ export default class Match {
   @Field(() => ID)
   id!: string;
 
-  @Field()
+  @Field(() => Team)
   homeTeam!: Team;
 
-  @Field()
+  @Field(() => Team)
   awayTeam!: Team;
 
-  @Field()
+  @Field(() => Number)
   homeScore!: number;
 
-  @Field()
+  @Field(() => Number)
   awayScore!: number;
 
-  @Field()
+  @Field(() => Date)
   startDate!: Date;
 
   @Field(() => MatchStatus)
   status!: MatchStatus;
 
-  @Field()
+  @Field(() => Date)
   periodStart!: Date;
 
-  @Field()
+  @Field(() => Competition)
   competition!: Competition;
 }

@@ -10,7 +10,7 @@ import { createGames } from "../../mockData/gamesFactory";
 export default class DailySummaryResolver {
   @Query(() => DailySummary)
   async dailySummaries(
-    @Args() { date, limit, offset }: DailySummaryArgs,
+    @Args(() => DailySummaryArgs) { date, limit, offset }: DailySummaryArgs,
   ): Promise<DailySummary> {
     // const { data } = await getScheduleSummaries<
     //   AxiosResponse<ScheduleSummariesResponseOne>

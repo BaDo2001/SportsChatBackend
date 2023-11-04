@@ -12,6 +12,6 @@ export default class DailySummaryArgs {
   @Max(50)
   limit: number;
 
-  @Field()
+  @Field(() => Date)
   date: Date;
 }

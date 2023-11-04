@@ -5,12 +5,12 @@ export default class Team {
   @Field(() => ID)
   id!: string;
 
-  @Field()
+  @Field(() => String)
   name!: string;
 
-  @Field()
+  @Field(() => String)
   shortName!: string;
 
-  @Field()
+  @Field(() => String)
   logo!: string;
 }

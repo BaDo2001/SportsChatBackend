@@ -5,12 +5,12 @@ import { ArgsType, Field, Int } from "type-graphql";
 export default class DailySummaryArgs {
   @Field(() => Int, { defaultValue: 0 })
   @Min(0)
-  offset: number;
+  cursor: number;
 
   @Field(() => Int, { defaultValue: 10 })
   @Min(1)
   @Max(50)
-  limit: number;
+  size: number;
 
   @Field(() => Date)
   date: Date;

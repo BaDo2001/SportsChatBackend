@@ -9,3 +9,51 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum MatchStatus {
+  FINISHED
+  SCHEDULED
+  IN_PLAY
+  HALFTIME
+  CANCELED
+  POSTPONED
+  EXTRA_TIME
+  PENALTY_SHOOTOUT
+  EXTRA_TIME_BREAK
+}
+
+model Match {
+  id String @id
+
+  homeScore   Int
+  awayScore   Int
+  startDate   DateTime
+  status      MatchStatus
+  periodStart DateTime
+
+  competitionId String
+  competition   Competition @relation(fields: [competitionId], references: [id])
+
+  homeTeamId String
+  awayTeamId String
+  homeTeam   Team   @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam   Team   @relation("AwayTeam", fields: [awayTeamId], references: [id])
+}
+
+model Team {
+  id        String @id
+  name      String
+  shortName String
+  logo      String
+
+  homeMatches Match[] @relation("HomeTeam")
+  awayMatches Match[] @relation("AwayTeam")
+}
+
+model Competition {
+  id   String @id
+  name String
+  logo String
+
+  matches Match[]
+}

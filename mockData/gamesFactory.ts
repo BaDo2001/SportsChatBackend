@@ -31,20 +31,24 @@ const getGameStatus = (date: DateTime): MatchStatus => {
 export const createGames = (date: DateTime) => {
   const games: Match[] = [];
 
+  const dateUtc = date.toUTC();
+
   for (const competition of competitions) {
     const pairings = getRandomPairings(competition.id);
 
     for (const pairing of pairings) {
-      const matchDate = date.set({
+      const matchDate = dateUtc.set({
         hour: Math.floor(Math.random() * 24),
       });
 
       const status = getGameStatus(matchDate);
 
       games.push({
-        id: `sr:match:${Math.floor(Math.random() * 1000000)}`,
+        id: `sr:match:${matchDate.toISODate()}:${pairing[0].id}:${
+          pairing[1].id
+        }`,
         startDate: matchDate.toJSDate(),
-        periodStart: (DateTime.now() > matchDate.plus({ minutes: 62 })
+        periodStart: (DateTime.now().toUTC() > matchDate.plus({ minutes: 62 })
           ? matchDate.plus({ minutes: 62 })
           : matchDate
         ).toJSDate(),

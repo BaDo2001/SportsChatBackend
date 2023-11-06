@@ -1,44 +1,32 @@
 import { DateTime } from "luxon";
 import { Args, Query, Resolver } from "type-graphql";
 
+import { lazyInject } from "@/container";
+import GamesService from "@/services/GamesService";
 import DailySummary from "@/types/DailySummary";
 import DailySummaryArgs from "@/types/DailySummaryArgs";
 
-import { createGames } from "../../mockData/gamesFactory";
-
 @Resolver(DailySummary)
 export default class DailySummaryResolver {
+  @lazyInject(GamesService)
+  gamesService: GamesService;
+
   @Query(() => DailySummary)
   async dailySummaries(
-    @Args(() => DailySummaryArgs) { date, limit, offset }: DailySummaryArgs,
+    @Args(() => DailySummaryArgs) { date, cursor, size }: DailySummaryArgs,
   ): Promise<DailySummary> {
-    // const { data } = await getScheduleSummaries<
-    //   AxiosResponse<ScheduleSummariesResponseOne>
-    // >(
-    //   "en",
-    //   date.toISOString().split("T")[0],
-    //   {
-    //     offset,
-    //     limit,
-    //   },
-    //   {
-    //     baseURL: "https://api.sportradar.com/soccer-extended/trial/v4",
-    //     params: {
-    //       api_key: process.env.SPORTRADAR_API_KEY,
-    //     },
-    //     headers: {
-    //       accept: "application/json",
-    //     },
-    //   },
-    // );
-
-    // console.log(JSON.stringify(data, null, 2));
-
-    const games = createGames(DateTime.fromJSDate(date));
+    const games = await this.gamesService.getDailyGames(
+      DateTime.fromJSDate(date),
+      cursor,
+      size + 1,
+    );
 
     return {
-      games: games.slice(offset, offset + limit),
-      totalGames: games.length,
+      games: games.slice(0, size),
+      pageInfo: {
+        hasNextPage: games.length > size,
+        endCursor: cursor + size,
+      },
     };
   }
 }

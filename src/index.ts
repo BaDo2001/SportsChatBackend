@@ -26,6 +26,7 @@ async function main() {
     schema,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
     introspection: true,
+    logger: console,
   });
 
   await server.start();

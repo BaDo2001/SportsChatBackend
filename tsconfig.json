@@ -9,7 +9,9 @@
     "baseUrl": "./src",
     "paths": {
       "@/*": ["*"],
-      "@/api": ["../sportradar/sportradar.ts"]
+      "@/api": ["../sportradar/sportradar.ts"],
+      "@/db": ["./db.ts"],
+      "@/mock/*": ["../mockData/*"]
     }
   },
   "ts-node": {

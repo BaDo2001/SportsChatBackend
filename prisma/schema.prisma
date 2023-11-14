@@ -10,26 +10,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum MatchStatus {
-  FINISHED
-  SCHEDULED
-  IN_PLAY
-  HALFTIME
-  CANCELED
-  POSTPONED
-  EXTRA_TIME
-  PENALTY_SHOOTOUT
-  EXTRA_TIME_BREAK
-}
-
 model Match {
   id String @id
 
-  homeScore   Int
-  awayScore   Int
-  startDate   DateTime
-  status      MatchStatus
-  periodStart DateTime
+  homeScore Int
+  awayScore Int
+  startDate DateTime
 
   competitionId String
   competition   Competition @relation(fields: [competitionId], references: [id])

@@ -1,8 +1,8 @@
 import { injectable } from "inversify";
-import type { DateTime } from "luxon";
+import { DateTime } from "luxon";
 
 import { prisma } from "@/db";
-import { createGames } from "@/mock/gamesFactory";
+import { createGames, getGameStatus } from "@/mock/gamesFactory";
 import type Match from "@/types/Match";
 
 @injectable()
@@ -32,8 +32,8 @@ export default class GamesService {
     //   },
     // );
 
-    const startDate = date.toUTC().startOf("day").toJSDate();
-    const endDate = date.toUTC().endOf("day").toJSDate();
+    const startDate = date.toJSDate();
+    const endDate = date.plus({ day: 1 }).toJSDate();
 
     const matches = await prisma.match.findMany({
       skip: offset,
@@ -55,7 +55,17 @@ export default class GamesService {
     });
 
     if (matches.length) {
-      return matches as Match[];
+      return matches.map((match) => {
+        const [status, periodStart] = getGameStatus(
+          DateTime.fromJSDate(match.startDate),
+        );
+
+        return {
+          ...match,
+          status,
+          periodStart: periodStart.toJSDate(),
+        };
+      });
     }
 
     const mockMatches = createGames(date);
@@ -86,8 +96,6 @@ export default class GamesService {
         startDate: match.startDate,
         homeScore: match.homeScore,
         awayScore: match.awayScore,
-        periodStart: match.periodStart,
-        status: match.status,
         homeTeamId: match.homeTeam.id,
         awayTeamId: match.awayTeam.id,
         competitionId: match.competition.id,

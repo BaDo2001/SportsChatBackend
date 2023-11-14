@@ -6,26 +6,26 @@ import { MatchStatus } from "@/types/Match";
 import { competitions } from "./competition";
 import { getRandomPairings } from "./teams";
 
-const getGameStatus = (date: DateTime): MatchStatus => {
+export const getGameStatus = (date: DateTime): [MatchStatus, DateTime] => {
   const now = DateTime.now();
 
   if (now < date) {
-    return MatchStatus.SCHEDULED;
+    return [MatchStatus.SCHEDULED, date];
   }
 
   if (now < date.plus({ minutes: 47 })) {
-    return MatchStatus.IN_PLAY;
+    return [MatchStatus.FIRST_HALF, date];
   }
 
   if (now < date.plus({ minutes: 62 })) {
-    return MatchStatus.HALFTIME;
+    return [MatchStatus.HALFTIME, date];
   }
 
   if (now < date.plus({ minutes: 112 })) {
-    return MatchStatus.IN_PLAY;
+    return [MatchStatus.SECOND_HALF, date.plus({ minutes: 62 })];
   }
 
-  return MatchStatus.FINISHED;
+  return [MatchStatus.FINISHED, date.plus({ minutes: 62 })];
 };
 
 export const createGames = (date: DateTime) => {
@@ -37,21 +37,18 @@ export const createGames = (date: DateTime) => {
     const pairings = getRandomPairings(competition.id);
 
     for (const pairing of pairings) {
-      const matchDate = dateUtc.set({
+      const matchDate = dateUtc.plus({
         hour: Math.floor(Math.random() * 24),
       });
 
-      const status = getGameStatus(matchDate);
+      const [status, periodStart] = getGameStatus(matchDate);
 
       games.push({
         id: `sr:match:${matchDate.toISODate()}:${pairing[0].id}:${
           pairing[1].id
         }`,
         startDate: matchDate.toJSDate(),
-        periodStart: (DateTime.now().toUTC() > matchDate.plus({ minutes: 62 })
-          ? matchDate.plus({ minutes: 62 })
-          : matchDate
-        ).toJSDate(),
+        periodStart: periodStart.toJSDate(),
         status,
         competition,
         homeTeam: pairing[0],

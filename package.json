@@ -10,7 +10,8 @@
     "lint:fix": "eslint --fix --ext .ts .",
     "prettier": "prettier --write \"src/**/*.ts\"",
     "prettier:check": "prettier --check \"src/**/*.ts\"",
-    "orval": "orval"
+    "orval": "orval",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",

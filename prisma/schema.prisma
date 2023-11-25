@@ -51,7 +51,16 @@ model User {
   email  String @unique
   avatar String
 
-  messages Message[]
+  messages  Message[]
+  PushToken PushToken[]
+}
+
+model PushToken {
+  id     String @id @default(uuid())
+  token  String @unique
+  userId String
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model Message {

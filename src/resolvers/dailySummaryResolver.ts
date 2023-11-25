@@ -6,7 +6,7 @@ import GamesService from "@/services/GamesService";
 import DailySummary from "@/types/DailySummary";
 import DailySummaryArgs from "@/types/DailySummaryArgs";
 
-@Resolver(DailySummary)
+@Resolver()
 export default class DailySummaryResolver {
   @lazyInject(GamesService)
   gamesService: GamesService;

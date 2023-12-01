@@ -7,7 +7,7 @@ import type { MessageInput } from "@/types/Message";
 
 @injectable()
 export default class MessageService {
-  public async getMessages(matchId: string): Promise<Message[]> {
+  public async getMessages(matchId: number): Promise<Message[]> {
     return prisma.message.findMany({
       where: {
         matchId,
@@ -24,7 +24,7 @@ export default class MessageService {
   public async addMessage(
     message: MessageInput,
     author: User,
-    matchId: string,
+    matchId: number,
   ): Promise<Message> {
     return prisma.message.create({
       data: {

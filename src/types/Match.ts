@@ -1,20 +1,8 @@
-import { Field, ID, ObjectType, registerEnumType } from "type-graphql";
+import { MatchStatus } from "@prisma/client";
+import { Field, Int, ObjectType, registerEnumType } from "type-graphql";
 
 import Competition from "./Competition";
 import Team from "./Team";
-
-export enum MatchStatus {
-  FINISHED = "FINISHED",
-  SCHEDULED = "SCHEDULED",
-  FIRST_HALF = "FIRST_HALF",
-  HALFTIME = "HALFTIME",
-  SECOND_HALF = "SECOND_HALF",
-  // CANCELED = "CANCELED",
-  // POSTPONED = "POSTPONED",
-  // EXTRA_TIME = "EXTRA_TIME",
-  // PENALTY_SHOOTOUT = "PENALTY_SHOOTOUT",
-  // EXTRA_TIME_BREAK = "EXTRA_TIME_BREAK",
-}
 
 registerEnumType(MatchStatus, {
   name: "MatchStatus",
@@ -22,8 +10,8 @@ registerEnumType(MatchStatus, {
 
 @ObjectType()
 export default class Match {
-  @Field(() => ID)
-  id!: string;
+  @Field(() => Int)
+  id!: number;
 
   @Field(() => Team)
   homeTeam!: Team;
@@ -43,8 +31,8 @@ export default class Match {
   @Field(() => MatchStatus)
   status!: MatchStatus;
 
-  @Field(() => Date)
-  periodStart!: Date;
+  @Field(() => Int)
+  elapsed!: number;
 
   @Field(() => Competition)
   competition!: Competition;

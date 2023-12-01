@@ -10,36 +10,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model DaysLoaded {
+  id  Int    @id @default(autoincrement())
+  day String @unique
+}
+
+enum MatchStatus {
+  FINISHED
+  SCHEDULED
+  FIRST_HALF
+  HALFTIME
+  SECOND_HALF
+}
+
 model Match {
-  id String @id
+  id Int @id
 
   homeScore Int
   awayScore Int
   startDate DateTime
+  elapsed   Int
+  status    MatchStatus
 
-  competitionId String
+  competitionId Int
   competition   Competition @relation(fields: [competitionId], references: [id])
 
-  homeTeamId String
-  awayTeamId String
-  homeTeam   Team   @relation("HomeTeam", fields: [homeTeamId], references: [id])
-  awayTeam   Team   @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  homeTeamId Int
+  awayTeamId Int
+  homeTeam   Team @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam   Team @relation("AwayTeam", fields: [awayTeamId], references: [id])
 
   messages Message[]
 }
 
 model Team {
-  id        String @id
-  name      String
-  shortName String
-  logo      String
+  id   Int    @id
+  name String
+  logo String
 
   homeMatches Match[] @relation("HomeTeam")
   awayMatches Match[] @relation("AwayTeam")
 }
 
 model Competition {
-  id   String @id
+  id   Int    @id
   name String
   logo String
 
@@ -71,6 +85,6 @@ model Message {
   authorId String
   author   User   @relation(fields: [authorId], references: [id])
 
-  matchId String
-  match   Match  @relation(fields: [matchId], references: [id])
+  matchId Int
+  match   Match @relation(fields: [matchId], references: [id])
 }

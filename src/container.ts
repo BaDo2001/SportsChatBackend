@@ -5,7 +5,9 @@ import GamesService from "./services/GamesService";
 import MessageService from "./services/MessageService";
 import UserService from "./services/UserService";
 
-const container = new Container();
+export const container = new Container({
+  defaultScope: "Singleton",
+});
 container.bind<GamesService>(GamesService).to(GamesService);
 container.bind<MessageService>(MessageService).to(MessageService);
 container.bind<UserService>(UserService).to(UserService);

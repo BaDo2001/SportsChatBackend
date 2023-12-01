@@ -2,6 +2,7 @@ import {
   Arg,
   Authorized,
   Ctx,
+  Int,
   Mutation,
   PubSub,
   PubSubEngine,
@@ -23,7 +24,7 @@ export default class MessageResolver {
 
   @Query(() => [Message])
   async messages(
-    @Arg("matchId", () => String) matchId: string,
+    @Arg("matchId", () => Int) matchId: number,
   ): Promise<Message[]> {
     return this.messageService.getMessages(matchId);
   }
@@ -32,7 +33,7 @@ export default class MessageResolver {
   @Mutation(() => Boolean)
   async sendMessage(
     @Arg("message", () => MessageInput) input: MessageInput,
-    @Arg("matchId", () => String) matchId: string,
+    @Arg("matchId", () => Int) matchId: number,
     @Ctx() ctx: Context,
     @PubSub() pubSub: PubSubEngine,
   ) {
@@ -41,7 +42,7 @@ export default class MessageResolver {
       ctx.user!,
       matchId,
     );
-    await pubSub.publish(matchId, message);
+    await pubSub.publish(matchId.toString(), message);
 
     return true;
   }

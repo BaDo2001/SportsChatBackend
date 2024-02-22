@@ -203,16 +203,20 @@ export default class GamesService {
   }
 }
 
-// cron.schedule("* * * * *", async () => {
-//   try {
-//     const updates = await container.get(GamesService).refreshLiveGames();
+cron.schedule("* * * * *", async () => {
+  try {
+    if (process.env.DISABLE_POLLING === "true") {
+      return;
+    }
 
-//     if (updates.length > 0) {
-//       await pubSub.publish(UPDATE_MATCH_SUMMARIES_TOPIC, {
-//         games: updates,
-//       });
-//     }
-//   } catch (error) {
-//     console.error(error);
-//   }
-// });
+    const updates = await container.get(GamesService).refreshLiveGames();
+
+    if (updates.length > 0) {
+      await pubSub.publish(UPDATE_MATCH_SUMMARIES_TOPIC, {
+        games: updates,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+  }
+});

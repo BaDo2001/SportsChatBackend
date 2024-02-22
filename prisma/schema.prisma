@@ -40,7 +40,8 @@ model Match {
   homeTeam   Team @relation("HomeTeam", fields: [homeTeamId], references: [id])
   awayTeam   Team @relation("AwayTeam", fields: [awayTeamId], references: [id])
 
-  messages Message[]
+  messages     Message[]
+  groupMembers GroupMember[]
 }
 
 model Team {
@@ -65,8 +66,9 @@ model User {
   email  String @unique
   avatar String
 
-  messages  Message[]
-  PushToken PushToken[]
+  messages    Message[]
+  PushToken   PushToken[]
+  GroupMember GroupMember[]
 }
 
 model PushToken {
@@ -81,9 +83,19 @@ model Message {
   id        String   @id @default(uuid())
   text      String
   createdAt DateTime @default(now())
+  elapsed   Int
 
   authorId String
   author   User   @relation(fields: [authorId], references: [id])
+
+  matchId Int
+  match   Match @relation(fields: [matchId], references: [id])
+}
+
+model GroupMember {
+  id     Int    @id @default(autoincrement())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
   matchId Int
   match   Match @relation(fields: [matchId], references: [id])

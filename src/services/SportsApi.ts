@@ -64,7 +64,7 @@ const leagues = [
   3, // Europa League
   88, // Eredivisie
   94, // Primeira Liga
-  1040,
+  206, // Turkish Cup
 ];
 
 const baseUrl = "https://api-football-v1.p.rapidapi.com/v3";
@@ -82,6 +82,8 @@ const getGames = async (date: DateTime) => {
     headers,
   });
 
+  console.log(data);
+
   return data.response.filter((match) => leagues.includes(match.league.id));
 };
 
@@ -93,6 +95,8 @@ const getLiveGames = async () => {
     },
     headers,
   });
+
+  console.log(data);
 
   return data.response.filter((match) => leagues.includes(match.league.id));
 };

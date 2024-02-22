@@ -25,7 +25,7 @@ export default class DailySummaryResolver {
       );
 
       return {
-        games: games.slice(0, -1),
+        games: games.slice(0, games.length > size ? size : games.length),
         pageInfo: {
           hasNextPage: games.length > size,
           endCursor: cursor + size,

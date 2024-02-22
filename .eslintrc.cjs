@@ -52,6 +52,7 @@ module.exports = defineConfig({
       "error",
       {
         ts: "never",
+        json: "always",
       },
     ],
     "import/no-unresolved": "off",

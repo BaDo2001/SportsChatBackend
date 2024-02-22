@@ -6,6 +6,7 @@
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "strictNullChecks": true,
+    "resolveJsonModule": true,
     "outDir": "./dist",
     "baseUrl": "./src",
     "paths": {

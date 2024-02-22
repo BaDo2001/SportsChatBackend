@@ -1,11 +1,7 @@
 node_modules
-
 schema.graphql
-
 .env
-
 dist
-
 sportradar.ts
-
 .DS_Store
+serviceAccountKey.json

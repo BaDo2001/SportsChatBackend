@@ -1,4 +1,4 @@
-import { Field, ID, InputType, ObjectType } from "type-graphql";
+import { Field, ID, InputType, Int, ObjectType } from "type-graphql";
 
 import User from "./User";
 
@@ -7,6 +7,9 @@ import User from "./User";
 export class MessageInput {
   @Field(() => String)
   text!: string;
+
+  @Field(() => Int)
+  elapsed!: number;
 }
 
 @ObjectType()

@@ -82,8 +82,6 @@ const getGames = async (date: DateTime) => {
     headers,
   });
 
-  console.log(data);
-
   return data.response.filter((match) => leagues.includes(match.league.id));
 };
 
@@ -95,8 +93,6 @@ const getLiveGames = async () => {
     },
     headers,
   });
-
-  console.log(data);
 
   return data.response.filter((match) => leagues.includes(match.league.id));
 };

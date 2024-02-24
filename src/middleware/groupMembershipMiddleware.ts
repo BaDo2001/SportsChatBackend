@@ -10,9 +10,7 @@ export default class GroupMembershipMiddleware
   @lazyInject(MessageService)
   messageService: MessageService;
 
-  async use({ context, info }: ResolverData<Context>, next: () => unknown) {
-    console.log(info);
-
+  async use({ context }: ResolverData<Context>, next: () => unknown) {
     const isGroupMember = await this.messageService.isGroupMember(
       1,
       context.user!,

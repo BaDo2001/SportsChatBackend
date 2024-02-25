@@ -10,9 +10,16 @@ export default class GroupMembershipMiddleware
   @lazyInject(MessageService)
   messageService: MessageService;
 
-  async use({ context }: ResolverData<Context>, next: () => unknown) {
+  async use({ context, args }: ResolverData<Context>, next: () => unknown) {
+    const matchId = args["matchId"] as string | undefined;
+
+    if (matchId === undefined) {
+      console.error("Match id is required");
+      throw new Error("Match id is required");
+    }
+
     const isGroupMember = await this.messageService.isGroupMember(
-      1,
+      parseInt(matchId, 10),
       context.user!,
     );
 

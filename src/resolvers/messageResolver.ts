@@ -47,6 +47,7 @@ export default class MessageResolver {
       ctx.user!,
       matchId,
     );
+
     await pubSub.publish(matchId.toString(), message);
 
     return true;

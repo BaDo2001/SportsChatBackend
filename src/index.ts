@@ -3,6 +3,7 @@ import "reflect-metadata";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
+import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default";
 import { json } from "body-parser";
 import cors from "cors";
 import express from "express";
@@ -27,7 +28,14 @@ async function main() {
 
   const schema = await getSchema();
 
-  const serverCleanup = useServer({ schema }, wsServer);
+  const serverCleanup = useServer(
+    {
+      schema,
+      context: (args) =>
+        getContext(args.connectionParams?.Authorization as string | undefined),
+    },
+    wsServer,
+  );
 
   const server = new ApolloServer<Context>({
     schema,
@@ -42,8 +50,15 @@ async function main() {
           };
         },
       },
+      ApolloServerPluginLandingPageLocalDefault({
+        footer: false,
+        embed: {
+          initialState: {
+            pollForSchemaUpdates: false,
+          },
+        },
+      }),
     ],
-    introspection: true,
     logger: console,
   });
 
@@ -73,9 +88,9 @@ async function main() {
   );
 
   await new Promise<void>((resolve) =>
-    httpServer.listen({ port: 4000 }, resolve),
+    httpServer.listen({ port: 5001 }, resolve),
   );
-  console.log(`🚀 Server ready at http://localhost:4000/graphql`);
+  console.log(`🚀 Server ready at http://localhost:5001/graphql`);
 }
 
 main();

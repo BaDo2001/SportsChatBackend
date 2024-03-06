@@ -2,6 +2,7 @@ import { MatchStatus } from "@prisma/client";
 import { Field, Int, ObjectType, registerEnumType } from "type-graphql";
 
 import Competition from "./Competition";
+import MatchEvent from "./MatchEvent";
 import Team from "./Team";
 
 registerEnumType(MatchStatus, {
@@ -36,4 +37,10 @@ export default class Match {
 
   @Field(() => Competition)
   competition!: Competition;
+}
+
+@ObjectType()
+export class MatchWithEvents extends Match {
+  @Field(() => [MatchEvent])
+  events!: MatchEvent[];
 }

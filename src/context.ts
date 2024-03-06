@@ -20,8 +20,6 @@ const authCache = new NodeCache({
 export const getContext = async (token?: string): Promise<Context> => {
   try {
     if (!token) {
-      console.log("No token");
-
       return {};
     }
 

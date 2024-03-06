@@ -20,6 +20,9 @@ import MessageService from "@/services/MessageService";
 import { Group, IsGroupMemberResponse } from "@/types/GroupMembership";
 import Message, { MessageInput } from "@/types/Message";
 
+export const SEND_MESSAGE_TOPIC = (matchId: number) =>
+  `SEND_MESSAGE_${matchId}`;
+
 @Resolver()
 export default class MessageResolver {
   @lazyInject(MessageService)
@@ -48,7 +51,7 @@ export default class MessageResolver {
       matchId,
     );
 
-    await pubSub.publish(matchId.toString(), message);
+    await pubSub.publish(SEND_MESSAGE_TOPIC(matchId), message);
 
     return true;
   }
@@ -56,7 +59,7 @@ export default class MessageResolver {
   @Authorized()
   @UseMiddleware(GroupMembershipMiddleware)
   @Subscription(() => Message, {
-    topics: ({ args }) => args.matchId,
+    topics: ({ args }) => SEND_MESSAGE_TOPIC(args.matchId),
   })
   newMessage(
     @Arg("matchId", () => String) _matchId: string,

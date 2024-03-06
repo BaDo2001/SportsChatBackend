@@ -6,10 +6,20 @@ import cron from "node-cron";
 import { container } from "@/container";
 import { prisma } from "@/db";
 import { pubSub } from "@/redis";
-import { UPDATE_MATCH_SUMMARIES_TOPIC } from "@/resolvers/dailySummaryResolver";
+import {
+  UPDATE_MATCH_SUMMARIES_TOPIC,
+  UPDATE_MATCH_TOPIC,
+} from "@/resolvers/gameResolver";
 import type Match from "@/types/Match";
+import type { MatchWithEvents } from "@/types/Match";
+import type MatchEvent from "@/types/MatchEvent";
 
-import { mapApiStatusToMatchStatus, SportsApi } from "./SportsApi";
+import { mapCompetition } from "./SportsApi/mappers/competition";
+import { mapMatch } from "./SportsApi/mappers/match";
+import { mapMatchEvents } from "./SportsApi/mappers/matchEvent";
+import { mapMatchStatus } from "./SportsApi/mappers/matchStatus";
+import { mapTeam } from "./SportsApi/mappers/team";
+import { SportsApi } from "./SportsApi";
 
 @injectable()
 export default class GamesService {
@@ -31,11 +41,7 @@ export default class GamesService {
     );
 
     await prisma.competition.createMany({
-      data: competitions.map((competition) => ({
-        id: competition.id,
-        name: competition.name,
-        logo: competition.logo,
-      })),
+      data: competitions.map(mapCompetition),
       skipDuplicates: true,
     });
 
@@ -46,26 +52,12 @@ export default class GamesService {
     );
 
     await prisma.team.createMany({
-      data: teams.map((team) => ({
-        id: team.id,
-        name: team.name,
-        logo: team.logo,
-      })),
+      data: teams.map(mapTeam),
       skipDuplicates: true,
     });
 
     await prisma.match.createMany({
-      data: gamesFromApi.map((match) => ({
-        id: match.fixture.id,
-        startDate: match.fixture.date,
-        homeScore: match.goals.home ?? 0,
-        awayScore: match.goals.away ?? 0,
-        homeTeamId: match.teams.home.id,
-        awayTeamId: match.teams.away.id,
-        competitionId: match.league.id,
-        elapsed: match.fixture.status.elapsed ?? 0,
-        status: mapApiStatusToMatchStatus(match.fixture.status.short),
-      })),
+      data: gamesFromApi.map(mapMatch),
       skipDuplicates: true,
     });
 
@@ -121,10 +113,14 @@ export default class GamesService {
     return this.getGamesFromDb(date, offset, limit);
   }
 
-  async refreshLiveGames(): Promise<Match[]> {
+  async refreshLiveGames(): Promise<MatchWithEvents[]> {
     await this.loadGamesFromApi(DateTime.now());
 
     const liveMatches = await SportsApi.getLiveGames();
+
+    const liveMatchesMap = new Map(
+      liveMatches.map((match) => [match.fixture.id, match]),
+    );
 
     const finishedMatches = await prisma.match.findMany({
       where: {
@@ -155,7 +151,7 @@ export default class GamesService {
     }
 
     if (liveMatches.length === 0) {
-      return prisma.match.findMany({
+      const finishedMatchData = await prisma.match.findMany({
         where: {
           id: {
             in: finishedMatches.map((match) => match.id),
@@ -167,6 +163,11 @@ export default class GamesService {
           competition: true,
         },
       });
+
+      return finishedMatchData.map((match) => ({
+        ...match,
+        events: [],
+      }));
     }
 
     await prisma.$transaction(
@@ -179,13 +180,13 @@ export default class GamesService {
             homeScore: match.goals.home ?? 0,
             awayScore: match.goals.away ?? 0,
             elapsed: match.fixture.status.elapsed ?? 0,
-            status: mapApiStatusToMatchStatus(match.fixture.status.short),
+            status: mapMatchStatus(match.fixture.status.short),
           },
         }),
       ),
     );
 
-    return prisma.match.findMany({
+    const matches = await prisma.match.findMany({
       where: {
         id: {
           in: [
@@ -200,6 +201,23 @@ export default class GamesService {
         competition: true,
       },
     });
+
+    return matches.map((match) => {
+      const matchDetails = liveMatchesMap.get(match.id);
+
+      return {
+        ...match,
+        events: matchDetails
+          ? mapMatchEvents(matchDetails.events, match.id)
+          : [],
+      };
+    });
+  }
+
+  async getMatchEvents(id: number): Promise<MatchEvent[]> {
+    const matchDetails = await SportsApi.getFixtureEvents(id);
+
+    return mapMatchEvents(matchDetails.response, id);
   }
 }
 
@@ -215,6 +233,12 @@ cron.schedule("* * * * *", async () => {
       await pubSub.publish(UPDATE_MATCH_SUMMARIES_TOPIC, {
         games: updates,
       });
+
+      await Promise.all(
+        updates.map((match) =>
+          pubSub.publish(UPDATE_MATCH_TOPIC(match.id), match),
+        ),
+      );
     }
   } catch (error) {
     console.error(error);

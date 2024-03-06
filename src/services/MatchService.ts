@@ -9,7 +9,7 @@ import { pubSub } from "@/redis";
 import {
   UPDATE_MATCH_SUMMARIES_TOPIC,
   UPDATE_MATCH_TOPIC,
-} from "@/resolvers/gameResolver";
+} from "@/resolvers/matchResolver";
 import type Match from "@/types/Match";
 import type { MatchWithEvents } from "@/types/Match";
 import type MatchEvent from "@/types/MatchEvent";
@@ -22,8 +22,8 @@ import { mapTeam } from "./SportsApi/mappers/team";
 import { SportsApi } from "./SportsApi";
 
 @injectable()
-export default class GamesService {
-  private async loadGamesFromApi(date: DateTime): Promise<void> {
+export default class MatchService {
+  private async loadMatchesFromApi(date: DateTime): Promise<void> {
     const dayLoaded = await prisma.daysLoaded.findUnique({
       where: {
         day: date.toISODate() ?? "",
@@ -34,10 +34,10 @@ export default class GamesService {
       return;
     }
 
-    const gamesFromApi = await SportsApi.getGames(date);
+    const matchesFromApi = await SportsApi.getMatches(date);
 
     const competitions = Array.from(
-      new Set(gamesFromApi.map((match) => match.league)).values(),
+      new Set(matchesFromApi.map((match) => match.league)).values(),
     );
 
     await prisma.competition.createMany({
@@ -47,7 +47,7 @@ export default class GamesService {
 
     const teams = Array.from(
       new Set(
-        gamesFromApi.flatMap((match) => [match.teams.home, match.teams.away]),
+        matchesFromApi.flatMap((match) => [match.teams.home, match.teams.away]),
       ).values(),
     );
 
@@ -57,7 +57,7 @@ export default class GamesService {
     });
 
     await prisma.match.createMany({
-      data: gamesFromApi.map(mapMatch),
+      data: matchesFromApi.map(mapMatch),
       skipDuplicates: true,
     });
 
@@ -68,7 +68,7 @@ export default class GamesService {
     });
   }
 
-  private async getGamesFromDb(
+  private async getMatchesFromDb(
     date: DateTime,
     offset: number,
     limit: number,
@@ -103,20 +103,20 @@ export default class GamesService {
     return matches;
   }
 
-  async getDailyGames(
+  async getDailyMatches(
     date: DateTime,
     offset: number,
     limit: number,
   ): Promise<Match[]> {
-    await this.loadGamesFromApi(date);
+    await this.loadMatchesFromApi(date);
 
-    return this.getGamesFromDb(date, offset, limit);
+    return this.getMatchesFromDb(date, offset, limit);
   }
 
-  async refreshLiveGames(): Promise<MatchWithEvents[]> {
-    await this.loadGamesFromApi(DateTime.now());
+  async refreshLiveMatches(): Promise<MatchWithEvents[]> {
+    await this.loadMatchesFromApi(DateTime.now());
 
-    const liveMatches = await SportsApi.getLiveGames();
+    const liveMatches = await SportsApi.getLiveMatches();
 
     const liveMatchesMap = new Map(
       liveMatches.map((match) => [match.fixture.id, match]),
@@ -227,11 +227,11 @@ cron.schedule("* * * * *", async () => {
       return;
     }
 
-    const updates = await container.get(GamesService).refreshLiveGames();
+    const updates = await container.get(MatchService).refreshLiveMatches();
 
     if (updates.length > 0) {
       await pubSub.publish(UPDATE_MATCH_SUMMARIES_TOPIC, {
-        games: updates,
+        matches: updates,
       });
 
       await Promise.all(

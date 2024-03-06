@@ -6,7 +6,7 @@ import PageInfo from "./PageInfo";
 @ObjectType()
 export class DailySummaryUpdate {
   @Field(() => [Match])
-  games: Match[];
+  matches: Match[];
 }
 
 @ObjectType()

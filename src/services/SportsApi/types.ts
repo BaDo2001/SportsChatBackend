@@ -72,7 +72,7 @@ export type ApiMatch = {
   };
 };
 
-export type ApiGamesResponse = {
+export type ApiMatchesResponse = {
   response: ApiMatch[];
 };
 

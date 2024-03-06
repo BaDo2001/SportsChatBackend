@@ -3,8 +3,8 @@ import type { DateTime } from "luxon";
 
 import type {
   ApiFixtureEventsResponse,
-  ApiGamesResponse,
   ApiLiveResponse,
+  ApiMatchesResponse,
 } from "./types";
 
 const leagues = [
@@ -25,8 +25,8 @@ const headers = {
   "x-rapidapi-host": "api-football-v1.p.rapidapi.com",
 };
 
-const getGames = async (date: DateTime) => {
-  const { data } = await axios.get<ApiGamesResponse>(`${baseUrl}/fixtures`, {
+const getMatches = async (date: DateTime) => {
+  const { data } = await axios.get<ApiMatchesResponse>(`${baseUrl}/fixtures`, {
     params: {
       date: date.toISODate(),
       timezone: "Europe/Budapest",
@@ -37,7 +37,7 @@ const getGames = async (date: DateTime) => {
   return data.response.filter((match) => leagues.includes(match.league.id));
 };
 
-const getLiveGames = async () => {
+const getLiveMatches = async () => {
   const { data } = await axios.get<ApiLiveResponse>(`${baseUrl}/fixtures`, {
     params: {
       timezone: "Europe/Budapest",
@@ -64,7 +64,7 @@ const getFixtureEvents = async (fixtureId: number) => {
 };
 
 export const SportsApi = {
-  getGames,
-  getLiveGames,
+  getMatches: getMatches,
+  getLiveMatches: getLiveMatches,
   getFixtureEvents,
 };

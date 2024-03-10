@@ -62,7 +62,7 @@ export default class MessageResolver {
     topics: ({ args }) => SEND_MESSAGE_TOPIC(args.matchId),
   })
   newMessage(
-    @Arg("matchId", () => String) _matchId: string,
+    @Arg("matchId", () => Int) _matchId: number,
     @Root() message: Message,
   ): Message {
     return message;

@@ -58,6 +58,11 @@ async function main() {
           },
         },
       }),
+      {
+        requestDidStart: async (requestContext) => {
+          console.log("Request started", requestContext);
+        },
+      },
     ],
     logger: console,
     introspection: true,

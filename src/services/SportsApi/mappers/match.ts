@@ -8,6 +8,8 @@ export const mapMatch = (match: ApiMatch): Match => ({
   startDate: new Date(match.fixture.date),
   homeScore: match.goals.home ?? 0,
   awayScore: match.goals.away ?? 0,
+  homeScoreHalfTime: match.score.halftime.home ?? 0,
+  awayScoreHalfTime: match.score.halftime.away ?? 0,
   homeTeamId: match.teams.home.id,
   awayTeamId: match.teams.away.id,
   competitionId: match.league.id,

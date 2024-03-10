@@ -59,6 +59,11 @@ export type ApiTeam = {
   logo: string;
 };
 
+export type ApiGoals = {
+  home: number | null;
+  away: number | null;
+};
+
 export type ApiMatch = {
   fixture: Fixture;
   league: ApiCompetition;
@@ -66,9 +71,9 @@ export type ApiMatch = {
     home: ApiTeam;
     away: ApiTeam;
   };
-  goals: {
-    home: number | null;
-    away: number | null;
+  goals: ApiGoals;
+  score: {
+    halftime: ApiGoals;
   };
 };
 

@@ -26,11 +26,13 @@ enum MatchStatus {
 model Match {
   id Int @id
 
-  homeScore Int
-  awayScore Int
-  startDate DateTime
-  elapsed   Int
-  status    MatchStatus
+  homeScore         Int
+  awayScore         Int
+  homeScoreHalfTime Int
+  awayScoreHalfTime Int
+  startDate         DateTime
+  elapsed           Int
+  status            MatchStatus
 
   competitionId Int
   competition   Competition @relation(fields: [competitionId], references: [id])

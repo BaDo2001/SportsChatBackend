@@ -26,6 +26,12 @@ export default class Match {
   @Field(() => Number)
   awayScore!: number;
 
+  @Field(() => Number)
+  homeScoreHalfTime!: number;
+
+  @Field(() => Number)
+  awayScoreHalfTime!: number;
+
   @Field(() => Date)
   startDate!: Date;
 

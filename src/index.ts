@@ -60,6 +60,7 @@ async function main() {
       }),
     ],
     logger: console,
+    introspection: true,
   });
 
   await server.start();

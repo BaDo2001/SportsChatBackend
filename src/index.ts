@@ -31,8 +31,13 @@ async function main() {
   const serverCleanup = useServer(
     {
       schema,
-      context: (args) =>
-        getContext(args.connectionParams?.Authorization as string | undefined),
+      context: (args) => {
+        console.log("Getting context for connection", args.connectionParams);
+
+        return getContext(
+          args.connectionParams?.Authorization as string | undefined,
+        );
+      },
     },
     wsServer,
   );
@@ -58,15 +63,6 @@ async function main() {
           },
         },
       }),
-      {
-        requestDidStart: async (requestContext) => {
-          console.log(
-            "Request started",
-            requestContext.operation,
-            requestContext.operationName,
-          );
-        },
-      },
     ],
     logger: console,
     introspection: true,

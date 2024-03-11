@@ -60,7 +60,11 @@ async function main() {
       }),
       {
         requestDidStart: async (requestContext) => {
-          console.log("Request started", requestContext);
+          console.log(
+            "Request started",
+            requestContext.operation,
+            requestContext.operationName,
+          );
         },
       },
     ],
